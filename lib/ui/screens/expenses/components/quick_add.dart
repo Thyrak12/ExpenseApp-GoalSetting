@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:saving_app/model/new_model.dart';
+import 'package:saving_app/model/model.dart';
 import '../../../theme/app_theme.dart';
 
 class QuickAddCard extends StatelessWidget {

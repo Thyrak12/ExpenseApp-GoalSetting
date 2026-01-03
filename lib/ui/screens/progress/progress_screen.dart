@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:saving_app/model/new_model.dart';
+import 'package:saving_app/model/model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/screen_header.dart';
 import 'components/savings_card.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../theme/app_theme.dart';
-import '../../../../model/new_model.dart';
+import '../../../../model/model.dart';
 import '../../../widgets/budget_breakdown_card.dart';
 
 class GoalFormPage extends StatefulWidget {

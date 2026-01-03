@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:saving_app/model/new_model.dart';
+import 'package:saving_app/model/model.dart';
 import 'package:saving_app/ui/theme/app_theme.dart';
 import '../../../widgets/common_widgets.dart';
 

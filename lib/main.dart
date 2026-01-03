@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:saving_app/model/new_model.dart';
+import 'package:saving_app/model/model.dart';
 import 'ui/screens/goal/goal_screen.dart';
 import 'ui/screens/expenses/expense_screen.dart';
 import 'ui/screens/progress/progress_screen.dart';
