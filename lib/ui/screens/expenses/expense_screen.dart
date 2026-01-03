@@ -3,7 +3,7 @@ import 'package:saving_app/model/model.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/screen_header.dart';
 import 'components/quick_add.dart';
-import 'components/monthly_budget_card.dart';
+import 'components/overall_budget_card.dart';
 import 'components/today_budget_card.dart';
 import 'components/expense_list.dart';
 
