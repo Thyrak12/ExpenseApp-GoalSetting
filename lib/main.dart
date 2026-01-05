@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'model/model.dart';
+import 'ui/screens/welcome/welcome_screen.dart';
 import 'ui/screens/goal/goal_screen.dart';
 import 'ui/screens/expenses/expense_screen.dart';
 import 'ui/screens/progress/progress_screen.dart';
@@ -37,6 +38,7 @@ class MainNavigation extends StatefulWidget {
 
 class _MainNavigationState extends State<MainNavigation> {
   int _currentIndex = 0;
+  bool _showWelcome = true;
 
   bool get hasCompleteData => dataManager.hasCompleteData;
   SavingService? get savingService => dataManager.getSavingService();
@@ -44,7 +46,20 @@ class _MainNavigationState extends State<MainNavigation> {
   void _refresh() => setState(() {});
 
   @override
+  void initState() {
+    super.initState();
+    _showWelcome = !hasCompleteData;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Show welcome screen for first-time users
+    if (_showWelcome && !hasCompleteData) {
+      return WelcomeScreen(
+        onGetStarted: () => setState(() => _showWelcome = false),
+      );
+    }
+
     if (!hasCompleteData) {
       return GoalScreen(
         savingService: null,

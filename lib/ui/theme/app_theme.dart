@@ -32,7 +32,7 @@ class AppTheme {
     return ThemeData.dark().copyWith(
       scaffoldBackgroundColor: backgroundColor,
       primaryColor: primaryColor,
-      colorScheme: const ColorScheme.dark(primary: primaryColor),
+      colorScheme: const ColorScheme.dark(primary: Color.fromARGB(255, 255, 255, 255)),
       appBarTheme: const AppBarTheme(
         backgroundColor: backgroundColor,
         elevation: 0,

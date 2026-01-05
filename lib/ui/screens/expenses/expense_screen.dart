@@ -68,7 +68,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
       appBar: AppBar(
         toolbarHeight: 80,
         backgroundColor: AppTheme.backgroundColor,
-        title: ScreenHeader(title: 'Expense', subtitle: 'Track your daily expense here',),
+        title: ScreenHeader(title: 'Expense', subtitle: 'Track your daily expense',),
       ),
       body: SafeArea(
         child: SingleChildScrollView(

@@ -121,7 +121,7 @@ class _ExpenseFormState extends State<ExpenseForm> {
               ),
               onPressed: () {
                 _save();
-                Navigator.pop(context);
+                if(_formKey.currentState!.validate()) Navigator.pop(context);
               },
               child: Text(
                 isEditing ? 'Update' : 'Save',
