@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:saving_app/model/model.dart';
-import 'package:saving_app/ui/theme/app_theme.dart';
-import '../../../widgets/common_widgets.dart';
+import '../../../theme/app_theme.dart';
+import '../../../widgets/glass_view.dart';
+import '../../../widgets/glass_badge.dart';
 
 class SavingsCard extends StatelessWidget {
-  final SavingGoal goal;
+  final double currentSaved;
+  final double targetAmount;
+  final double progress;
+  final int daysLeft;
 
-  const SavingsCard({super.key, required this.goal});
+  const SavingsCard({
+    super.key,
+    required this.currentSaved,
+    required this.targetAmount,
+    required this.progress,
+    required this.daysLeft,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final progress = goal.savingProgress;
-
     return GlassView(
       gradient: AppTheme.primaryGradient,
-      accentColor: Colors.white,
       hasShadow: true,
+      accentColor: Colors.white,
       leftHeader: const GlassBadge(
-        icon: Icons.savings_rounded,
+        icon: Icons.savings,
         text: 'Current Savings',
         color: Colors.white,
       ),
-      rightHeader: Text(
-        '${goal.daysLeft} days left',
-        style: TextStyle(color: Colors.white.withOpacity(0.6), fontSize: 12),
-      ),
-      title: '\$${goal.currentSaved.toStringAsFixed(0)}',
-      miniTitle: 'of \$${goal.targetAmount.toStringAsFixed(0)}',
-      subtitle: 'Day ${goal.daysElapsed} of ${goal.totalDays} • ${(progress * 100).toStringAsFixed(0)}% complete',
+      title: '\$${currentSaved.toStringAsFixed(0)}',
+      miniTitle: 'of \$${targetAmount.toStringAsFixed(0)}',
+      subtitle: '${(progress * 100).toStringAsFixed(0)}% complete • $daysLeft days left',
       progress: progress,
     );
   }

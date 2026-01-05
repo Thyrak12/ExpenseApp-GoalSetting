@@ -1,140 +1,113 @@
 import 'package:flutter/material.dart';
-import 'package:saving_app/model/model.dart';
+import '../../../../model/model.dart';
 import '../../../theme/app_theme.dart';
 
-class TodayExpensesList extends StatelessWidget {
-  final SavingGoal goal;
+class ExpenseList extends StatelessWidget {
+  final List<DailyExpense> expenses;
+  final Function(DailyExpense) onEdit;
+  final Function(DailyExpense) onDelete;
 
-  const TodayExpensesList({super.key, required this.goal});
+  const ExpenseList({
+    super.key,
+    required this.expenses,
+    required this.onEdit,
+    required this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
-          'Today\'s Expenses',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: AppTheme.textPrimary,
-          ),
-        ),
+        const Text("Today's Expenses", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
-        if (goal.findExpense(DateTime.now()).isEmpty)
-          const EmptyExpenseCard(
-            title: 'No expenses today',
-            subtitle: 'Use Quick Add above',
-          )
+        if (expenses.isEmpty)
+          _EmptyState()
         else
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppTheme.cardColor,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              children: goal.findExpense(DateTime.now()).map((e) => ExpenseRow(expense: e)).toList(),
-            ),
-          ),
+          ...expenses.map((e) => _ExpenseItem(
+            expense: e,
+            onEdit: () => onEdit(e),
+            onDelete: () => onDelete(e),
+          )),
       ],
     );
   }
 }
 
-class ExpenseRow extends StatelessWidget {
-  final DailyExpense expense;
-
-  const ExpenseRow({super.key, required this.expense});
-
+class _EmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppTheme.cardColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Column(
         children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: expense.category.color.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(expense.category.icon, color: expense.category.color, size: 16),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  expense.title,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: AppTheme.textPrimary,
-                  ),
-                ),
-                Text(
-                  expense.category.title,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppTheme.textSecondary.withOpacity(0.7),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            '-\$${expense.amount.toStringAsFixed(0)}',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: expense.category.color,
-            ),
-          ),
+          Icon(Icons.receipt_long, color: AppTheme.textSecondary, size: 32),
+          SizedBox(height: 8),
+          Text('No expenses today', style: TextStyle(color: AppTheme.textSecondary)),
         ],
       ),
     );
   }
 }
 
-class EmptyExpenseCard extends StatelessWidget {
-  final String title;
-  final String subtitle;
+class _ExpenseItem extends StatelessWidget {
+  final DailyExpense expense;
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
 
-  const EmptyExpenseCard({
-    super.key,
-    required this.title,
-    required this.subtitle,
+  const _ExpenseItem({
+    required this.expense,
+    required this.onEdit,
+    required this.onDelete,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppTheme.cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white10),
       ),
-      child: Column(
+      child: Row(
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppTheme.textSecondary.withOpacity(0.7),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: expense.category.color.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(expense.category.icon, color: expense.category.color, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(expense.title, style: const TextStyle(fontWeight: FontWeight.w500)),
+                Text(expense.category.title, style: const TextStyle(color: AppTheme.textSecondary, fontSize: 12)),
+              ],
             ),
           ),
-          const SizedBox(height: 4),
           Text(
-            subtitle,
-            style: TextStyle(
-              fontSize: 12,
-              color: AppTheme.textSecondary.withOpacity(0.5),
-            ),
+            '-\$${expense.amount.toStringAsFixed(0)}',
+            style: TextStyle(color: expense.category.color, fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          PopupMenuButton<String>(
+            onSelected: (v) {
+              if (v == 'edit') onEdit();
+              else onDelete();
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'edit', child: Text('Edit')),
+              PopupMenuItem(value: 'delete', child: Text('Delete')),
+            ],
           ),
         ],
       ),

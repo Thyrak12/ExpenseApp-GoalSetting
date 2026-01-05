@@ -3,15 +3,9 @@ import '../theme/app_theme.dart';
 
 class ScreenHeader extends StatelessWidget {
   final String title;
-  final String? subtitle;
-  final Widget? trailing;
+  final String subtitle;
 
-  const ScreenHeader({
-    super.key,
-    required this.title,
-    this.subtitle,
-    this.trailing,
-  });
+  const ScreenHeader({super.key, required this.title, required this.subtitle});
 
   @override
   Widget build(BuildContext context) {
@@ -31,20 +25,17 @@ class ScreenHeader extends StatelessWidget {
                   color: AppTheme.textPrimary,
                 ),
               ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                Text(
-                  subtitle!,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: AppTheme.textSecondary,
-                  ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppTheme.textSecondary,
                 ),
-              ],
+              ),
             ],
           ),
         ),
-        if (trailing != null) trailing!,
       ],
     );
   }

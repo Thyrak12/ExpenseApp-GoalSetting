@@ -1,44 +1,49 @@
 import 'package:flutter/material.dart';
-import 'package:saving_app/model/model.dart';
+import 'package:saving_app/ui/widgets/screen_header.dart';
+import '../../../model/model.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/screen_header.dart';
+import 'components/expense_history.dart';
 import 'components/savings_card.dart';
 import 'components/stats_row.dart';
-import 'components/expense_history.dart';
 
 class ProgressScreen extends StatelessWidget {
-  final SavingGoal goal;
+  final SavingService savingService;
 
-  const ProgressScreen({super.key, required this.goal});
+  const ProgressScreen({super.key, required this.savingService});
 
   @override
   Widget build(BuildContext context) {
+    final goal = savingService.goal;
+
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
+      appBar: AppBar(
+        toolbarHeight: 80,
+        backgroundColor: AppTheme.backgroundColor,
+        title: ScreenHeader(title: 'Progress', subtitle: 'Track your journey'),
+      ),
       body: SafeArea(
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.all(20),
-              sliver: SliverList(
-                delegate: SliverChildListDelegate([
-                  const ScreenHeader(
-                    title: 'Progress',
-                    subtitle: 'Track your saving journey',
-                  ),
-                  const SizedBox(height: 24),
-                  SavingsCard(goal: goal),
-                  const SizedBox(height: 24),
-                  StatsRow(goal: goal),
-                  const SizedBox(height: 28),
-                  ExpenseHistoryHeader(totalExpenses: goal.expenses.length),
-                  const SizedBox(height: 16),
-                ]),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SavingsCard(
+                currentSaved: savingService.currentSaved,
+                targetAmount: goal.targetAmount,
+                progress: savingService.savingProgress,
+                daysLeft: goal.daysLeft,
               ),
-            ),
-            ExpenseHistoryList(expenses: goal.expensesByDate),
-          ],
+              const SizedBox(height: 20),
+              StatsRow(
+                daysElapsed: goal.daysElapsed,
+                dailySave: goal.dailySave,
+                totalSpent: savingService.totalSpent,
+              ),
+              const SizedBox(height: 24),
+              ExpenseHistory(expenses: savingService.expensesByDate),
+            ],
+          ),
         ),
       ),
     );

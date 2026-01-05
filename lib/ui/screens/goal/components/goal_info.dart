@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
 import '../../../../model/model.dart';
 import '../../../widgets/budget_breakdown_card.dart';
-import 'active_goal_card.dart';
+import 'goal_card.dart';
 
 class GoalInfoPage extends StatelessWidget {
-  final SavingGoal goal;
+  final SavingService savingService;
 
-  const GoalInfoPage({
-    super.key,
-    required this.goal,
-  });
+  const GoalInfoPage({super.key, required this.savingService});
 
   @override
   Widget build(BuildContext context) {
-
+    final goal = savingService.goal;
+    
     return Column(
       children: [
-        ActiveGoalCard(goal: goal),
-        const SizedBox(height: 24),
+        GoalCard(goal: goal),
+        const SizedBox(height: 16),
         BudgetBreakdownCard(
           daysLeft: goal.daysLeft,
           saveTarget: goal.dailySave,
-          dailyLimit: goal.dailyLimit,
-          totalSpendable: goal.durationLimit,
+          dailyLimit: savingService.dailyLimit,
+          totalSpendable: savingService.durationLimit,
         ),
       ],
     );

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:saving_app/ui/widgets/screen_header.dart';
 import '../../../model/model.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/screen_header.dart';
 import 'components/goal_form.dart';
 import 'components/goal_info.dart';
 
 class GoalScreen extends StatefulWidget {
-  final SavingGoal? currentGoal;
-  final Function(SavingGoal) onGoalCreated;
+  final SavingService? savingService;
+  final Function(SavingGoal, Income) onGoalCreated;
   final VoidCallback onGoalDeleted;
 
   const GoalScreen({
     super.key,
-    this.currentGoal,
+    this.savingService,
     required this.onGoalCreated,
     required this.onGoalDeleted,
   });
@@ -22,52 +22,25 @@ class GoalScreen extends StatefulWidget {
 }
 
 class _GoalScreenState extends State<GoalScreen> {
-  void _onGoalSaved(SavingGoal goal) {
-    widget.onGoalCreated(goal);
-  }
-
-  String _getTitle() {
-    if (widget.currentGoal != null) return 'Your Goal';
-    return 'Create Goal';
-  }
-
   void _showDeleteConfirmation() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: AppTheme.surfaceColor,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Row(
-          children: [
-            Icon(Icons.warning_rounded, color: Colors.redAccent, size: 28),
-            SizedBox(width: 12),
-            Text('Delete Goal?', style: TextStyle(color: AppTheme.textPrimary)),
-          ],
-        ),
-        content: Text(
-          'This will permanently delete the goal and all its expenses and progress.',
-          style: const TextStyle(color: AppTheme.textSecondary, height: 1.5),
-        ),
+        title: const Text('Delete Goal?'),
+        content: const Text('This will delete all data.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: AppTheme.textSecondary),
-            ),
+            child: const Text('Cancel'),
           ),
-          ElevatedButton(
+          TextButton(
             onPressed: () {
               Navigator.pop(context);
               widget.onGoalDeleted();
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.redAccent,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-            ),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Delete'),
           ),
         ],
       ),
@@ -76,58 +49,39 @@ class _GoalScreenState extends State<GoalScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final hasGoal = widget.currentGoal != null;
+    final hasGoal = widget.savingService != null;
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
+      appBar: AppBar(
+        toolbarHeight: 80,
+        backgroundColor: AppTheme.backgroundColor,
+        title: ScreenHeader(title: hasGoal ? 'Your Goal' : 'Create Goal', subtitle: hasGoal? 'Your goal information' : 'Create your goal below'),
+        actions: hasGoal
+            ? [
+                PopupMenuButton<String>(
+                  onSelected: (v) {
+                    if (v == 'delete') _showDeleteConfirmation();
+                  },
+                  itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'delete', child: Row(
+                      children: [
+                        Icon(Icons.delete, color: Colors.red, size: 20),
+                        SizedBox(width: 8),
+                        Text('Delete Goal'),
+                      ],
+                    )),
+                  ],
+                ),
+              ]
+            : null,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              ScreenHeader(
-                title: _getTitle(),
-                subtitle: hasGoal
-                    ? 'Track your progress'
-                    : 'Set your saving target',
-                trailing: hasGoal
-                    ? PopupMenuButton(
-                        color: AppTheme.surfaceColor,
-                        elevation: 8,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        itemBuilder: (context) => [
-                          PopupMenuItem(
-                            onTap: _showDeleteConfirmation,
-                            child: const Row(
-                              children: [
-                                Icon(
-                                  Icons.delete_rounded,
-                                  color: Color.fromARGB(255, 255, 255, 255),
-                                  size: 20,
-                                ),
-                                SizedBox(width: 12),
-                                Text(
-                                  'Delete Goal',
-                                  style: TextStyle(
-                                    color: Color.fromARGB(255, 255, 255, 255),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      )
-                    : null,
-              ),
-              const SizedBox(height: 20),
-              hasGoal
-                  ? GoalInfoPage(goal: widget.currentGoal!)
-                  : GoalFormPage(onSave: _onGoalSaved),
-            ],
-          ),
+          padding: const EdgeInsets.all(16),
+          child: hasGoal
+              ? GoalInfoPage(savingService: widget.savingService!)
+              : GoalFormPage(onSave: widget.onGoalCreated),
         ),
       ),
     );

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
-/// Reusable budget breakdown card showing financial calculations
 class BudgetBreakdownCard extends StatelessWidget {
   final int daysLeft;
   final double saveTarget;
