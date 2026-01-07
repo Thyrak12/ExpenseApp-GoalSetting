@@ -9,7 +9,6 @@ class GoalScreen extends StatefulWidget {
   final SavingService? savingService;
   final Function(SavingGoal, Income) onGoalCreated;
   final VoidCallback onGoalDeleted;
-  final Future<void> Function()? onMarkCompleted;
   final bool isCompleted;
 
   const GoalScreen({
@@ -17,7 +16,6 @@ class GoalScreen extends StatefulWidget {
     this.savingService,
     required this.onGoalCreated,
     required this.onGoalDeleted,
-    this.onMarkCompleted,
     required this.isCompleted,
   });
 
@@ -53,10 +51,7 @@ class _GoalScreenState extends State<GoalScreen> {
     );
   }
 
-  Future<void> _handleCreateNewGoal() async {
-    if (widget.onMarkCompleted != null) {
-      await widget.onMarkCompleted!();
-    }
+  void _handleCreateNewGoal() {
     setState(() => _showNewGoalForm = true);
   }
 

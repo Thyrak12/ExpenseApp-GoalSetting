@@ -41,7 +41,12 @@ class _MainNavigationState extends State<MainNavigation> {
   bool _showWelcome = true;
 
   bool get hasCompleteData => dataManager.hasCompleteData;
-  bool get isCompleted => dataManager.goalRepo.goal?.isCompleted ?? false;
+
+  bool get isCompleted {
+    final goal = dataManager.goalRepo.goal;
+    if (goal == null) return false;
+    return goal.isCompleted || goal.isEnded;
+  }
   SavingService? get savingService => dataManager.getSavingService();
 
   void _refresh() => setState(() {});
@@ -50,6 +55,15 @@ class _MainNavigationState extends State<MainNavigation> {
   void initState() {
     super.initState();
     _showWelcome = !hasCompleteData;
+    _checkAndMarkCompleted();
+  }
+
+  Future<void> _checkAndMarkCompleted() async {
+    final goal = dataManager.goalRepo.goal;
+    if (goal != null && goal.isEnded && !goal.isCompleted) {
+      await dataManager.goalRepo.markAsCompleted();
+      _refresh();
+    }
   }
 
   @override
@@ -88,9 +102,6 @@ class _MainNavigationState extends State<MainNavigation> {
                 await dataManager.clearAll();
                 setState(() => _currentIndex = 0);
               },
-              onMarkCompleted: () async {
-                await dataManager.goalRepo.markAsCompleted();
-              },
               isCompleted: isCompleted,
             ),
             ProgressScreen(savingService: service),
@@ -107,9 +118,6 @@ class _MainNavigationState extends State<MainNavigation> {
               onGoalDeleted: () async {
                 await dataManager.clearAll();
                 setState(() => _currentIndex = 0);
-              },
-              onMarkCompleted: () async {
-                await dataManager.goalRepo.markAsCompleted();
               },
               isCompleted: isCompleted,
             ),

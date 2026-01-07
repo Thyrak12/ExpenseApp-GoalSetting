@@ -141,6 +141,12 @@ class SavingGoal {
   int get daysElapsed => (DateTime.now().difference(startDate).inDays + 1).clamp(0, totalDays);
   double get dailySave => targetAmount / totalDays;
 
+  bool get isEnded {
+    final now = DateTime.now();
+    final endOfDay = DateTime(endDate.year, endDate.month, endDate.day, 23, 59, 59);
+    return now.isAfter(endOfDay);
+  }
+
   SavingGoal copyWith({
     String? id,
     String? title,

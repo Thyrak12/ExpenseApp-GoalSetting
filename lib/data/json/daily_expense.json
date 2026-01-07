@@ -1,1 +1,23 @@
-[]
+[
+  {
+    "id": "9cd03f9a-a36c-48b5-b518-7840845852ee",
+    "title": "Lunch",
+    "amount": 1.0,
+    "category": "ExpenseCategory.food",
+    "date": "2026-01-07T20:53:04.867410"
+  },
+  {
+    "id": "39671148-2957-4774-9505-40402cd11b4c",
+    "title": "Fuel",
+    "amount": 1.0,
+    "category": "ExpenseCategory.travel",
+    "date": "2026-01-07T20:53:11.079124"
+  },
+  {
+    "id": "5d78c6ee-447a-4630-a817-2c0ad60849b5",
+    "title": "Movie",
+    "amount": 1.0,
+    "category": "ExpenseCategory.entertainment",
+    "date": "2026-01-07T20:53:19.302358"
+  }
+]

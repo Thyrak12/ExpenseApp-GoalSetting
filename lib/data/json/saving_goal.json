@@ -1,1 +1,8 @@
-{}
+{
+  "id": "e4c49373-1818-43bc-ad7d-fecfc2b093da",
+  "title": "Buffet",
+  "targetAmount": 10.0,
+  "startDate": "2026-01-01T20:52:30.951202",
+  "endDate": "2026-01-06T00:00:00.000",
+  "isCompleted": true
+}
