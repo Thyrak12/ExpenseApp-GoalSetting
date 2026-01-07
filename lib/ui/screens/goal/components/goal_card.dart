@@ -11,17 +11,19 @@ class GoalCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCompleted = goal.isCompleted;
+    
     return GlassView(
-      gradient: AppTheme.primaryGradient,
+      gradient: isCompleted ? AppTheme.secondaryGradient : AppTheme.primaryGradient,
       hasShadow: true,
       accentColor: Colors.white,
-      leftHeader: const GlassBadge(
-        icon: Icons.flag,
-        text: 'Active Goal',
+      leftHeader: GlassBadge(
+        icon: isCompleted ? Icons.check_circle : Icons.flag,
+        text: isCompleted ? 'Completed' : 'Active Goal',
         color: Colors.white,
       ),
       rightHeader: Text(
-        '${goal.daysLeft} days left',
+        isCompleted ? 'Goal ended' : '${goal.daysLeft} days left',
         style: const TextStyle(color: Colors.white70, fontSize: 12),
       ),
       title: goal.title,

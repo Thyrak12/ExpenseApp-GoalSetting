@@ -9,12 +9,16 @@ class GoalScreen extends StatefulWidget {
   final SavingService? savingService;
   final Function(SavingGoal, Income) onGoalCreated;
   final VoidCallback onGoalDeleted;
+  final Future<void> Function()? onMarkCompleted;
+  final bool isCompleted;
 
   const GoalScreen({
     super.key,
     this.savingService,
     required this.onGoalCreated,
     required this.onGoalDeleted,
+    this.onMarkCompleted,
+    required this.isCompleted,
   });
 
   @override
@@ -22,10 +26,12 @@ class GoalScreen extends StatefulWidget {
 }
 
 class _GoalScreenState extends State<GoalScreen> {
+  bool _showNewGoalForm = false;
+
   void _showDeleteConfirmation() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (_) => AlertDialog(
         backgroundColor: AppTheme.surfaceColor,
         title: const Text('Delete Goal?'),
         content: const Text('This will delete all data.'),
@@ -35,11 +41,11 @@ class _GoalScreenState extends State<GoalScreen> {
             child: const Text('Cancel'),
           ),
           TextButton(
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(context);
               widget.onGoalDeleted();
             },
-            style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),
           ),
         ],
@@ -47,30 +53,60 @@ class _GoalScreenState extends State<GoalScreen> {
     );
   }
 
+  Future<void> _handleCreateNewGoal() async {
+    if (widget.onMarkCompleted != null) {
+      await widget.onMarkCompleted!();
+    }
+    setState(() => _showNewGoalForm = true);
+  }
+
   @override
   Widget build(BuildContext context) {
     final hasGoal = widget.savingService != null;
+    final showForm = !hasGoal || _showNewGoalForm;
 
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         toolbarHeight: 80,
         backgroundColor: AppTheme.backgroundColor,
-        title: ScreenHeader(title: hasGoal ? 'Your Goal' : 'Create Goal', subtitle: hasGoal? 'Your goal information' : 'Create your goal below'),
-        actions: hasGoal
+        leading: _showNewGoalForm
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () => setState(() => _showNewGoalForm = false),
+              )
+            : null,
+        title: ScreenHeader(
+          title: showForm ? 'Create Goal' : 'Your Goal',
+          subtitle: showForm ? 'Create your goal below' : 'Your goal information',
+        ),
+        actions: hasGoal && !_showNewGoalForm
             ? [
                 PopupMenuButton<String>(
-                  onSelected: (v) {
-                    if (v == 'delete') _showDeleteConfirmation();
+                  onSelected: (ctx) {
+                    if (widget.isCompleted) {
+                      _handleCreateNewGoal();
+                    } else {
+                      _showDeleteConfirmation();
+                    }
                   },
-                  itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'delete', child: Row(
-                      children: [
-                        Icon(Icons.delete, color: Colors.red, size: 20),
-                        SizedBox(width: 8),
-                        Text('Delete Goal'),
-                      ],
-                    )),
+                  itemBuilder: (ctx) => [
+                    PopupMenuItem(
+                      value: 'action',
+                      child: Row(
+                        children: widget.isCompleted
+                            ? [
+                                Icon(Icons.create, color: AppTheme.primaryColor, size: 20),
+                                const SizedBox(width: 8),
+                                const Text('Create New Goal'),
+                              ]
+                            : const [
+                                Icon(Icons.delete, color: Colors.red, size: 20),
+                                SizedBox(width: 8),
+                                Text('Delete Goal'),
+                              ],
+                      ),
+                    ),
                   ],
                 ),
               ]
@@ -79,9 +115,12 @@ class _GoalScreenState extends State<GoalScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
-          child: hasGoal
-              ? GoalInfoPage(savingService: widget.savingService!)
-              : GoalFormPage(onSave: widget.onGoalCreated),
+          child: showForm
+              ? GoalFormPage(onSave: (goal, income) {
+                  widget.onGoalCreated(goal, income);
+                  setState(() => _showNewGoalForm = false);
+                })
+              : GoalInfoPage(savingService: widget.savingService!),
         ),
       ),
     );

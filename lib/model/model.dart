@@ -136,11 +136,28 @@ class SavingGoal {
     };
   }
 
-  /// Basic date calculations (don't depend on external data)
   int get totalDays => endDate.difference(startDate).inDays + 1;
   int get daysLeft => (endDate.difference(DateTime.now()).inDays + 1).clamp(0, totalDays);
   int get daysElapsed => (DateTime.now().difference(startDate).inDays + 1).clamp(0, totalDays);
   double get dailySave => targetAmount / totalDays;
+
+  SavingGoal copyWith({
+    String? id,
+    String? title,
+    double? targetAmount,
+    DateTime? startDate,
+    DateTime? endDate,
+    bool? isCompleted,
+  }) {
+    return SavingGoal(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      targetAmount: targetAmount ?? this.targetAmount,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      isCompleted: isCompleted ?? this.isCompleted,
+    );
+  }
 }
 
 class SavingService {

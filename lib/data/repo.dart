@@ -108,6 +108,14 @@ class SavingGoalRepository extends BaseJsonRepository<SavingGoal> {
     await clearFile();
   }
 
+  /// Mark the goal as completed
+  Future<void> markAsCompleted() async {
+    if (goal != null) {
+      goal = goal!.copyWith(isCompleted: true);
+      await save();
+    }
+  }
+
   /// Export as formatted JSON string
   String? exportJson() {
     if (goal == null) return null;

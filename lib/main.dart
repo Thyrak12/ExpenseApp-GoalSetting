@@ -41,6 +41,7 @@ class _MainNavigationState extends State<MainNavigation> {
   bool _showWelcome = true;
 
   bool get hasCompleteData => dataManager.hasCompleteData;
+  bool get isCompleted => dataManager.goalRepo.goal?.isCompleted ?? false;
   SavingService? get savingService => dataManager.getSavingService();
 
   void _refresh() => setState(() {});
@@ -53,7 +54,6 @@ class _MainNavigationState extends State<MainNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    // Show welcome screen for first-time users
     if (_showWelcome && !hasCompleteData) {
       return WelcomeScreen(
         onGetStarted: () => setState(() => _showWelcome = false),
@@ -69,46 +69,85 @@ class _MainNavigationState extends State<MainNavigation> {
           _refresh();
         },
         onGoalDeleted: () {},
+        isCompleted: false,
       );
     }
 
     final service = savingService!;
+    final screens = isCompleted
+        ? [
+            GoalScreen(
+              savingService: service,
+              onGoalCreated: (goal, income) async {
+                await dataManager.goalRepo.setGoal(goal);
+                await dataManager.incomeRepo.setIncome(income);
+                await dataManager.expenseRepo.clearAll();
+                _refresh();
+              },
+              onGoalDeleted: () async {
+                await dataManager.clearAll();
+                setState(() => _currentIndex = 0);
+              },
+              onMarkCompleted: () async {
+                await dataManager.goalRepo.markAsCompleted();
+              },
+              isCompleted: isCompleted,
+            ),
+            ProgressScreen(savingService: service),
+          ]
+        : [
+            GoalScreen(
+              savingService: service,
+              onGoalCreated: (goal, income) async {
+                await dataManager.goalRepo.setGoal(goal);
+                await dataManager.incomeRepo.setIncome(income);
+                await dataManager.expenseRepo.clearAll();
+                _refresh();
+              },
+              onGoalDeleted: () async {
+                await dataManager.clearAll();
+                setState(() => _currentIndex = 0);
+              },
+              onMarkCompleted: () async {
+                await dataManager.goalRepo.markAsCompleted();
+              },
+              isCompleted: isCompleted,
+            ),
+            ExpenseScreen(savingService: service, onExpenseChanged: _refresh),
+            ProgressScreen(savingService: service),
+          ];
 
-    final screens = [
-      GoalScreen(
-        savingService: service,
-        onGoalCreated: (goal, income) async {
-          await dataManager.goalRepo.setGoal(goal);
-          await dataManager.incomeRepo.setIncome(income);
-          _refresh();
-        },
-        onGoalDeleted: () async {
-          await dataManager.clearAll();
-          setState(() => _currentIndex = 0);
-        },
-      ),
-      ExpenseScreen(
-        savingService: service,
-        onExpenseChanged: _refresh,
-      ),
-      ProgressScreen(savingService: service),
-    ];
+    final navItems = isCompleted
+        ? const [
+            BottomNavigationBarItem(icon: Icon(Icons.flag), label: 'Goal'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.trending_up),
+              label: 'Progress',
+            ),
+          ]
+        : const [
+            BottomNavigationBarItem(icon: Icon(Icons.flag), label: 'Goal'),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.receipt),
+              label: 'Expenses',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.trending_up),
+              label: 'Progress',
+            ),
+          ];
 
+    final safeIndex = _currentIndex.clamp(0, screens.length - 1);
     return Scaffold(
-      body: screens[_currentIndex],
+      body: screens[safeIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
+        currentIndex: safeIndex,
         onTap: (i) => setState(() => _currentIndex = i),
         backgroundColor: AppTheme.surfaceColor,
         selectedItemColor: AppTheme.primaryColor,
         unselectedItemColor: AppTheme.textSecondary,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.flag), label: 'Goal'),
-          BottomNavigationBarItem(icon: Icon(Icons.receipt), label: 'Expenses'),
-          BottomNavigationBarItem(icon: Icon(Icons.trending_up), label: 'Progress'),
-        ],
+        items: navItems,
       ),
     );
   }
 }
-

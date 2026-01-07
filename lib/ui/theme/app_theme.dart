@@ -16,6 +16,12 @@ class AppTheme {
     colors: [Color(0xFF00D09C), Color(0xFF00A87E)],
   );
 
+  static const LinearGradient secondaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF6C63FF), Color(0xFF5A52D5)],
+  );
+
   static const LinearGradient cardGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
